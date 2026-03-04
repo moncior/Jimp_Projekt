@@ -1,8 +1,8 @@
 #ifndef GRAF_H
 #define GRAF_H
 
-#define MAX_PUNKTOW 1000
-#define MAX_WIERZCHOLKOW 5000
+#define MAX_WIERZCHOLKOW 1000
+#define MAX_KRAWEDZI 5000
 
 typedef struct {
     double x;
@@ -11,7 +11,7 @@ typedef struct {
 
     double dx;
     double dy;
-}punkt;
+}wierzcholek;
 
 typedef struct {
     int poczatek;
@@ -20,11 +20,11 @@ typedef struct {
 }krawedz;
 
 typedef struct{
-    punkt punkty[MAX_PUNKTOW];
-    int liczba_punktow;
-    
-    krawedz krawedzie[MAX_WIERZCHOLKOW];
+    wierzcholek wierzcholki[MAX_WIERZCHOLKOW];
     int liczba_wierzcholkow;
+    
+    krawedz krawedzie[MAX_KRAWEDZI];
+    int liczba_krawedzi;
 }graf;
 
 #endif 
