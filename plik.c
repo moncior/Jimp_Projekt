@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include "plik.h"
 
-int wczytywanie(graf*g, const char *nazwa_pliku){
-    FILE*plik=fopen(nazwa_pliku,"r");
+int load_file(graf*g, const char *filename){
+    FILE*plik=fopen(filename,"r");
     if(plik==NULL){
     printf("Nie można otworzyć pliku z danymi");
     return 0;
@@ -15,7 +15,7 @@ g->liczba_wierzcholkow = 0;
     int wezel_a, wezel_b;
     double waga;
 
-    printf("Rozpoczynam wczytywanie pliku: %s\n", nazwa_pliku);
+    printf("Rozpoczynam wczytywanie pliku: %s\n", filename);
 
     while (fscanf(plik, "%49s %d %d %lf", nazwa_krawedzi, &wezel_a, &wezel_b, &waga) == 4) {
         

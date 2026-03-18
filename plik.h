@@ -2,10 +2,10 @@
 #define PLIK_H
 #include "graf.h"
 
-void wczytywanie(graf*g,const char *nazwa_pliku);
+int load_file(graf*g,const char *filename);
 
-void wypisywanie_tekstowo(graf*g,const char*nazwa_pliku);
+void write_text(graf*g,const char*filename);
 
-void wypisywanie_binarnie(graf*g,const char*nazwa_pliku);
+void write_binary(graf*g,const char*filename);
 
 #endif 
