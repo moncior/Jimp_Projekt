@@ -1,43 +1,75 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "plik.h"
 
-int load_file(graf*g, const char *filename){
-    FILE*plik=fopen(filename,"r");
-    if(plik==NULL){
-    printf("Nie można otworzyć pliku z danymi");
-    return 0;
-}
-g->liczba_wierzcholkow = 0;
-    g->liczba_krawedzi = 0;
-
-    char nazwa_krawedzi[50];
-    int wezel_a, wezel_b;
-    double waga;
-
-    printf("Rozpoczynam wczytywanie pliku: %s\n", filename);
-
-    while (fscanf(plik, "%49s %d %d %lf", nazwa_krawedzi, &wezel_a, &wezel_b, &waga) == 4) {
-        
-        if (g->liczba_krawedzi >= MAX_KRAWEDZI) {
-            printf("OSTRZEZENIE: Osiagnieto limit krawedzi (%d). Reszta zignorowana.\n", MAX_KRAWEDZI);
-            break;
-        }
-
-        g->krawedzie[g->liczba_krawedzi].poczatek = wezel_a;
-        g->krawedzie[g->liczba_krawedzi].koniec = wezel_b;
-        g->krawedzie[g->liczba_krawedzi].waga = waga;
-        g->liczba_krawedzi++;
-
-        dodaj_punkt_jesli_brak(g, wezel_a);
-        dodaj_punkt_jesli_brak(g, wezel_b);
+int load_file(Graph *g, const char *filename) {
+    if (g == NULL || filename == NULL) {
+        fprintf(stderr, "Blad: nieprawidlowy graf lub nazwa pliku.\n");
+        return 0;
     }
 
-    fclose(plik);
-    printf("Wczytano sukcesem! Liczba wierzcholkow: %d, Liczba krawedzi: %d\n", 
-           g->liczba_punktow, g->liczba_krawedzi);
-    
+    FILE *file = fopen(filename, "r");
+    if (file == NULL) {
+        fprintf(stderr, "Blad: nie mozna otworzyc pliku wejsciowego: %s\n", filename);
+        return 0;
+    }
+
+    g->node_count = 0;
+    g->edge_count = 0;
+
+    char edge_name[50];
+    int from;
+    int to;
+    double weight;
+
+    while (fscanf(file, "%49s %d %d %lf", edge_name, &from, &to, &weight) == 4) {
+        if (graph_add_edge(g, from, to, weight) != 0) {
+            fprintf(stderr, "Blad: nie udalo sie dodac krawedzi (%d -> %d).\n", from, to);
+            fclose(file);
+            return 0;
+        }
+    }
+
+    fclose(file);
     return 1;
 }
 
+void write_text(Graph *g, const char *filename) {
+    if (g == NULL || filename == NULL) {
+        fprintf(stderr, "Blad: nieprawidlowy graf lub nazwa pliku.\n");
+        return;
+    }
+
+    FILE *file = fopen(filename, "w");
+    if (file == NULL) {
+        fprintf(stderr, "Blad: nie mozna otworzyc wyjsciowego pliku tekstowego: %s\n", filename);
+        return;
+    }
+
+    for (int i = 0; i < g->edge_count; i++) {
+        fprintf(file, "edge_%d %d %d %.6f\n", i, g->edges[i].from, g->edges[i].to, g->edges[i].weight);
+    }
+
+    fclose(file);
+}
+
+void write_binary(Graph *g, const char *filename) {
+    if (g == NULL || filename == NULL) {
+        fprintf(stderr, "Blad: nieprawidlowy graf lub nazwa pliku.\n");
+        return;
+    }
+
+    FILE *file = fopen(filename, "wb");
+    if (file == NULL) {
+        fprintf(stderr, "Blad: nie mozna otworzyc wyjsciowego pliku binarnego: %s\n", filename);
+        return;
+    }
+
+    fwrite(&g->node_count, sizeof(int), 1, file);
+    fwrite(&g->edge_count, sizeof(int), 1, file);
+    fwrite(g->nodes, sizeof(Node), g->node_count, file);
+    fwrite(g->edges, sizeof(Edge), g->edge_count, file);
+
+    fclose(file);
 }
