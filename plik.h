@@ -1,11 +1,11 @@
 #ifndef PLIK_H
 #define PLIK_H
-#include "graf.h"
+#include "graph.h"
 
-int load_file(graf*g,const char *filename);
+int load_file(Graph*g,const char *filename);
 
-void write_text(graf*g,const char*filename);
+void write_text(Graph*g,const char*filename);
 
-void write_binary(graf*g,const char*filename);
+void write_binary(Graph*g,const char*filename);
 
 #endif 
