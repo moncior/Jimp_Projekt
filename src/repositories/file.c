@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "plik.h"
+#include "file.h"
 
 int load_file(Graph *g, const char *filename) {
     if (g == NULL || filename == NULL) {
