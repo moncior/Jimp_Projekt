@@ -11,7 +11,7 @@ int graph_init(Graph *g) {
  
     g->nodes = (Node *)malloc(g->node_capacity * sizeof(Node));
     if (g->nodes == NULL) {
-        fprintf(stderr, "Błąd: Brak pamięci operacyjnej\n");
+            fprintf(stderr, "Blad: Brak pamieci operacyjnej\n");
         return -1;
     }
  
@@ -20,7 +20,7 @@ int graph_init(Graph *g) {
  
     g->edges = (Edge *)malloc(g->edge_capacity * sizeof(Edge));
     if (g->edges == NULL) {
-        fprintf(stderr, "Błąd: Brak pamięci operacyjnej\n");
+            fprintf(stderr, "Blad: Brak pamieci operacyjnej\n");
         free(g->nodes);
         g->nodes = NULL;
         return -1;
@@ -52,7 +52,7 @@ int graph_grow_nodes(Graph *g) {
     int new_capacity = g->node_capacity * 2;
     Node *tmp = (Node *)realloc(g->nodes, new_capacity * sizeof(Node));
     if (tmp == NULL) {
-        fprintf(stderr, "Błąd: Brak pamięci operacyjnej\n");
+            fprintf(stderr, "Blad: Brak pamieci operacyjnej\n");
         return -1;
     }
     g->nodes         = tmp;
@@ -64,7 +64,7 @@ int graph_grow_edges(Graph *g) {
     int new_capacity = g->edge_capacity * 2;
     Edge *tmp = (Edge *)realloc(g->edges, new_capacity * sizeof(Edge));
     if (tmp == NULL) {
-        fprintf(stderr, "Błąd: Brak pamięci operacyjnej\n");
+            fprintf(stderr, "Blad: Brak pamieci operacyjnej\n");
         return -1;
     }
     g->edges = tmp;

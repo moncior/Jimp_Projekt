@@ -31,7 +31,7 @@ void eades(Graph *g, double area, int iterations) {
     if ((m > 0) && (!edge_from_idx || !edge_to_idx)) {
         free(edge_from_idx);
         free(edge_to_idx);
-        fprintf(stderr, "Błąd: Brak pamięci operacyjnej\n");
+        fprintf(stderr, "Blad: Brak pamieci operacyjnej\n");
         return;
     }
 

@@ -5,13 +5,13 @@
 
 int load_file(Graph *g, const char *filename) {
     if (g == NULL || filename == NULL) {
-        fprintf(stderr, "Blad: nieprawidlowy graf lub nazwa pliku.\n");
+	    fprintf(stderr, "Blad: Nieprawidlowy graf lub nazwa pliku.\n");
         return 0;
     }
 
     FILE *file = fopen(filename, "r");
     if (file == NULL) {
-        fprintf(stderr, "Blad: nie mozna otworzyc pliku wejsciowego: %s\n", filename);
+	    fprintf(stderr, "Blad: Nie mozna otworzyc pliku wejsciowego: %s\n", filename);
         return 0;
     }
 
@@ -25,7 +25,7 @@ int load_file(Graph *g, const char *filename) {
 
     while (fscanf(file, "%49s %d %d %lf", edge_name, &from, &to, &weight) == 4) {
         if (graph_add_edge(g, from, to, weight) != 0) {
-            fprintf(stderr, "Blad: nie udalo sie dodac krawedzi (%d -> %d).\n", from, to);
+	        fprintf(stderr, "Blad: Nie udalo sie dodac krawedzi (%d -> %d).\n", from, to);
             fclose(file);
             return 0;
         }
@@ -37,13 +37,13 @@ int load_file(Graph *g, const char *filename) {
 
 void write_text(Graph *g, const char *filename) {
     if (g == NULL || filename == NULL) {
-        fprintf(stderr, "Blad: nieprawidlowy graf lub nazwa pliku.\n");
+	    fprintf(stderr, "Blad: Nieprawidlowy graf lub nazwa pliku.\n");
         return;
     }
 
     FILE *file = fopen(filename, "w");
     if (file == NULL) {
-        fprintf(stderr, "Blad: nie mozna otworzyc wyjsciowego pliku tekstowego: %s\n", filename);
+	    fprintf(stderr, "Blad: Nie mozna otworzyc wyjsciowego pliku tekstowego: %s\n", filename);
         return;
     }
 
@@ -56,13 +56,13 @@ void write_text(Graph *g, const char *filename) {
 
 void write_binary(Graph *g, const char *filename) {
     if (g == NULL || filename == NULL) {
-        fprintf(stderr, "Blad: nieprawidlowy graf lub nazwa pliku.\n");
+	    fprintf(stderr, "Blad: Nieprawidlowy graf lub nazwa pliku.\n");
         return;
     }
 
     FILE *file = fopen(filename, "wb");
     if (file == NULL) {
-        fprintf(stderr, "Blad: nie mozna otworzyc wyjsciowego pliku binarnego: %s\n", filename);
+	    fprintf(stderr, "Blad: Nie mozna otworzyc wyjsciowego pliku binarnego: %s\n", filename);
         return;
     }
 
