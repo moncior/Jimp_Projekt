@@ -139,6 +139,28 @@ static int load_graph_from_text(Graph *g, const char *filename) {
 	return 1;
 }
 
+static int is_nonplanar_by_necessary_conditions(const Graph *g) {
+	int n = g->node_count;
+	if (n < 3) {
+		return 0;
+	}
+
+	int unique_edge_count = 0;
+
+	for (int i = 0; i < g->edge_count; i++) {
+		int u = graph_find_node(g, g->edges[i].from);
+		int v = graph_find_node(g, g->edges[i].to);
+
+		if (u < 0 || v < 0 || u == v) {
+			continue;
+		}
+
+		unique_edge_count++;
+	}
+
+	return unique_edge_count > 3 * n - 6;
+}
+
 int main(int argc, char **argv) {
 	if (argc != 9) {
 		fprintf(stderr, "Blad: Nieprawidlowe parametry wywolania.\n");
@@ -216,6 +238,10 @@ int main(int argc, char **argv) {
 	if (!load_graph_from_text(&graph, input_file)) {
 		graph_free(&graph);
 		return 1;
+	}
+
+	if (is_nonplanar_by_necessary_conditions(&graph)) {
+		fprintf(stderr, "Uwaga: Wczytany graf jest nieplanarny.\n");
 	}
 
 	if (equals_ignore_case(algorithm, "circle")) {
