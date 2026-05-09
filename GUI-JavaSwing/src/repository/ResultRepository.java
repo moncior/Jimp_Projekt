@@ -1,12 +1,23 @@
 package repository;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class ResultRepository {
-    public void getGraph(File graph){
+    private HashMap<Integer, Coordinates> position;
+    private ArrayList<Adjacency> graph;
+
+    public ResultRepository(){
+        position = new HashMap<>();
+        graph = new ArrayList<>();
 
     }
-    public void getCoordinates(File path){
+    public void readGraph(File graph){
+
+    }
+    public void readCoordinates(File path){
 
     }
 }
+

@@ -6,10 +6,10 @@ import javax.swing.*;
 import java.io.File;
 
 public class MainController{
-    private ResultRepository data;
+    private ResultRepository repository;
 
-    public MainController(ResultRepository data){
-        this.data = data;
+    public MainController(ResultRepository repository){
+        this.repository = repository;
     }
 
     public File getFile(){
@@ -22,13 +22,31 @@ public class MainController{
         return null;
     }
 
-    public void readGraph(File f){
-        if(f != null)
-            data.getGraph(f);
+    public void loadGraph(){
+        new Thread(() -> {
+            try{
+                File f = getFile();
+                if(f != null)
+                    repository.readGraph(f);
+                //wyswietl graf w frame
+            }
+            catch (Exception e){
+
+            }
+        }).start();
     }
 
-    public void readCoordinates(File f){
-        if(f != null)
-            data.getCoordinates(f);
+    public void loadCoordinates(){
+        new Thread(() -> {
+            try{
+                File f = getFile();
+                if(f != null)
+                    repository.readCoordinates(f);
+                //wyswietl graf w frame
+            }
+            catch (Exception e){
+
+            }
+        }).start();
     }
 }
