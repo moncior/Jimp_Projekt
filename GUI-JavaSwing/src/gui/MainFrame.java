@@ -12,17 +12,22 @@ public class MainFrame extends JFrame {
     private JButton readGraph;
     private JButton readCoordinates;
     private JFileChooser fileChooser;
+    private JSlider zoom;
 
-    MainFrame(){
+    public MainFrame(){
         setTitle("Graph layout");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(500,500);
         setVisible(true);
-        MainController controller = new MainController(new ResultRepository());
+        MainController controller = new MainController(this, new ResultRepository());
         readGraph = new JButton();
         readCoordinates = new JButton();
+        fileChooser = new JFileChooser();
         readGraph.addActionListener(e -> controller.loadGraph());
         readCoordinates.addActionListener(e -> controller.loadCoordinates());
+        zoom = new JSlider(10, 300, 100);   //dodac implementacje slidera
+        //dodac zmienainie wspolrzednych przeciagnieciem myszki
+        //w planach wyskakujace okienka np jak nie uda sie wczytac pliku itp
     }
 
     public File getFile(){

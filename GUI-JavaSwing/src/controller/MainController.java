@@ -1,5 +1,6 @@
 package controller;
 
+import gui.MainFrame;
 import repository.ResultRepository;
 
 import javax.swing.*;
@@ -7,31 +8,23 @@ import java.io.File;
 
 public class MainController{
     private ResultRepository repository;
+    private MainFrame frame;
 
-    public MainController(ResultRepository repository){
+    public MainController(MainFrame frame, ResultRepository repository){
+        this.frame = frame;
         this.repository = repository;
-    }
-
-    public File getFile(){
-        JFileChooser chooser = new JFileChooser();
-        chooser.setCurrentDirectory(new File("."));
-        int result = chooser.showOpenDialog(chooser);
-        if(result == JFileChooser.APPROVE_OPTION) {
-            return chooser.getSelectedFile();
-        }
-        return null;
     }
 
     public void loadGraph(){
         new Thread(() -> {
             try{
-                File f = getFile();
+                File f = frame.getFile();
                 if(f != null)
                     repository.readGraph(f);
                 //wyswietl graf w frame
             }
             catch (Exception e){
-
+                //dodac wyswietlanie bledu w gui
             }
         }).start();
     }
@@ -39,13 +32,13 @@ public class MainController{
     public void loadCoordinates(){
         new Thread(() -> {
             try{
-                File f = getFile();
+                File f = frame.getFile();
                 if(f != null)
                     repository.readCoordinates(f);
                 //wyswietl graf w frame
             }
             catch (Exception e){
-
+                //dodac wyswietlanie bledu w gui
             }
         }).start();
     }
