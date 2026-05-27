@@ -7,22 +7,27 @@ import java.awt.FlowLayout;
 import java.awt.geom.Point2D;
 import java.io.File;
 import javax.swing.*;
+import repository.Edge;
 import repository.ResultRepository;
 
 public class MainFrame extends JFrame {
+
     private JButton readCoordinates;
     private JFileChooser fileChooser;
-    
+    private DrawGraph graph;
+
     public MainFrame(){
         setTitle("Graph layout");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(500,500);
-        setVisible(true);
+        setSize(500, 500);
+        setLayout(new BorderLayout());
+
         MainController controller = new MainController(this, new ResultRepository());
-        readCoordinates = new JButton();
+
         fileChooser = new JFileChooser();
-        readCoordinates = new JButton("Wczytaj plik");
-        readCoordinates.setPreferredSize(new Dimension(100, 20));
+
+        readCoordinates = new JButton("Wczytaj pliki");
+        readCoordinates.setPreferredSize(new Dimension(120, 25));
         readCoordinates.addActionListener(e -> controller.loadCoordinates());
 
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -32,20 +37,30 @@ public class MainFrame extends JFrame {
 
         setVisible(true);
     }
+
     public File getFile(){
         fileChooser.setCurrentDirectory(new File("."));
-        int result = fileChooser.showOpenDialog(fileChooser);
+
+        int result = fileChooser.showOpenDialog(this);
+
         if(result == JFileChooser.APPROVE_OPTION) {
             return fileChooser.getSelectedFile();
         }
+
         return null;
     }
-    
-    public void showGraph(Point2D.Double[] points, int[] ids){
-        DrawGraph graph = new DrawGraph(points, ids);
-        add(graph);
+
+    public void showGraph(Point2D.Double[] points, int[] ids, Edge[] edges){
+
+        if(graph != null){
+            remove(graph);
+        }
+
+        graph = new DrawGraph(points, ids, edges);
+
+        add(graph, BorderLayout.CENTER);
+
         revalidate();
         repaint();
     }
-
 }
