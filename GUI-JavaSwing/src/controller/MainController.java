@@ -1,12 +1,12 @@
 package controller;
 
 import gui.MainFrame;
+import java.awt.geom.Point2D;
+import java.io.File;
 import repository.ResultRepository;
 
-import javax.swing.*;
-import java.io.File;
+public class MainController {
 
-public class MainController{
     private ResultRepository repository;
     private MainFrame frame;
 
@@ -15,30 +15,22 @@ public class MainController{
         this.repository = repository;
     }
 
-    public void loadGraph(){
-        new Thread(() -> {
-            try{
-                File f = frame.getFile();
-                if(f != null)
-                    repository.readGraph(f);
-                //wyswietl graf w frame
-            }
-            catch (Exception e){
-                //dodac wyswietlanie bledu w gui
-            }
-        }).start();
-    }
-
     public void loadCoordinates(){
         new Thread(() -> {
             try{
                 File f = frame.getFile();
-                if(f != null)
+
+                if(f != null){
                     repository.readCoordinates(f);
-                //wyswietl graf w frame
+
+                    Point2D.Double[] points = repository.getPoints();
+                    int[] ids = repository.getIds();
+
+                    frame.showGraph(points, ids);
+                }
             }
             catch (Exception e){
-                //dodac wyswietlanie bledu w gui
+                e.printStackTrace();
             }
         }).start();
     }
