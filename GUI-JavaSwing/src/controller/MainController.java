@@ -3,6 +3,8 @@ package controller;
 import gui.MainFrame;
 import java.awt.geom.Point2D;
 import java.io.File;
+
+import repository.Edge;
 import repository.ResultRepository;
 
 public class MainController {
@@ -16,22 +18,41 @@ public class MainController {
     }
 
     public void loadCoordinates(){
+
         new Thread(() -> {
+
             try{
-                File f = frame.getFile();
 
-                if(f != null){
-                    repository.readCoordinates(f);
+                // wybór pliku punktów
+                File coordFile = frame.getFile();
 
-                    Point2D.Double[] points = repository.getPoints();
-                    int[] ids = repository.getIds();
-
-                    frame.showGraph(points, ids);
+                if(coordFile == null){
+                    return;
                 }
+
+                // wybór pliku krawędzi
+                File edgeFile = frame.getFile();
+
+                if(edgeFile == null){
+                    return;
+                }
+
+                // wczytanie danych
+                repository.readCoordinates(coordFile);
+                repository.readEdges(edgeFile);
+
+                // pobranie danych
+                Point2D.Double[] points = repository.getPoints();
+                int[] ids = repository.getIds();
+                Edge[] edges = repository.getEdges();
+
+                // rysowanie grafu
+                frame.showGraph(points, ids, edges);
             }
             catch (Exception e){
                 e.printStackTrace();
             }
+
         }).start();
     }
 }
