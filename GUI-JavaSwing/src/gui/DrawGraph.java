@@ -28,27 +28,28 @@ public class DrawGraph extends JPanel {
 
         double scale = 20;
 
-        // OSIE - czarne
         g2.setColor(Color.BLACK);
         g2.drawLine(0, centerY, getWidth(), centerY);
         g2.drawLine(centerX, 0, centerX, getHeight());
 
-        // LINIE - czerwone
         g2.setColor(Color.RED);
 
-        for (int i = 0; i < points.length - 1; i++) {
+        for (int i = 0; i < points.length; i++) {
+
+            int next = (i + 1) % points.length;
 
             int x1 = centerX + (int)(points[i].x * scale);
             int y1 = centerY - (int)(points[i].y * scale);
 
-            int x2 = centerX + (int)(points[i + 1].x * scale);
-            int y2 = centerY - (int)(points[i + 1].y * scale);
+            int x2 = centerX + (int)(points[next].x * scale);
+            int y2 = centerY - (int)(points[next].y * scale);
 
+            g2.setColor(Color.RED);
             g2.drawLine(x1, y1, x2, y2);
 
             double length = Math.sqrt(
-                    Math.pow(points[i + 1].x - points[i].x, 2) +
-                    Math.pow(points[i + 1].y - points[i].y, 2)
+                    Math.pow(points[next].x - points[i].x, 2) +
+                    Math.pow(points[next].y - points[i].y, 2)
             );
 
             int midX = (x1 + x2) / 2;
@@ -69,10 +70,8 @@ public class DrawGraph extends JPanel {
             g2.drawString(lengthText, -10, -6);
             g2.rotate(-angle);
             g2.translate(-midX, -midY);
-            g2.setColor(Color.RED);
         }
 
-        // PUNKTY - niebieskie
         g2.setColor(Color.BLUE);
 
         for (int i = 0; i < points.length; i++) {
