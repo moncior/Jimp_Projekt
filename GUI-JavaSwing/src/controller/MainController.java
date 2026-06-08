@@ -2,10 +2,14 @@ package controller;
 
 import gui.MainFrame;
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 
 import repository.Edge;
 import repository.ResultRepository;
+
+import javax.swing.*;
 
 public class MainController {
 
@@ -24,22 +28,60 @@ public class MainController {
             try{
 
                 // wybór pliku punktów
-                File coordFile = frame.getFile();
+                File coordFile = frame.getFile("Wybierz plik z koordynatami wierzchołków");
 
                 if(coordFile == null){
                     return;
                 }
-
+                try{
+                    repository.readCoordinates(coordFile);
+                }
+                catch(IOException io){
+                    SwingUtilities.invokeLater(() ->
+                            JOptionPane.showMessageDialog(frame,
+                                    "Nie udało się wczytać pliku",
+                                    "Błąd wczytywania pliku",
+                                    JOptionPane.ERROR_MESSAGE)
+                    );
+                    return;
+                }
+                catch(NumberFormatException n){
+                    SwingUtilities.invokeLater(() ->
+                            JOptionPane.showMessageDialog(frame,
+                                    "Plik zawiera niepoprawne dane",
+                                    "Błąd wczytywania pliku",
+                                    JOptionPane.ERROR_MESSAGE)
+                    );
+                    return;
+                }
                 // wybór pliku krawędzi
-                File edgeFile = frame.getFile();
+                File edgeFile = frame.getFile("Wybierz plik z krawędziami grafu");
 
                 if(edgeFile == null){
                     return;
                 }
 
-                // wczytanie danych
-                repository.readCoordinates(coordFile);
-                repository.readEdges(edgeFile);
+                try{
+                    repository.readEdges(edgeFile);
+                }
+                catch(IOException io){
+                    SwingUtilities.invokeLater(() ->
+                            JOptionPane.showMessageDialog(frame,
+                                    "Nie udało się wczytać pliku",
+                                    "Błąd wczytywania pliku",
+                                    JOptionPane.ERROR_MESSAGE)
+                    );
+                    return;
+                }
+                catch(NumberFormatException n){
+                    SwingUtilities.invokeLater(() ->
+                            JOptionPane.showMessageDialog(frame,
+                                    "Plik zawiera niepoprawne dane",
+                                    "Błąd wczytywania pliku",
+                                    JOptionPane.ERROR_MESSAGE)
+                    );
+                    return;
+                }
 
                 // pobranie danych
                 Point2D.Double[] points = repository.getPoints();

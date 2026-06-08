@@ -1,6 +1,8 @@
 package gui;
 
 import java.awt.*;
+import java.awt.event.*;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import javax.swing.JPanel;
 import repository.Edge;
@@ -11,10 +13,117 @@ public class DrawGraph extends JPanel {
     private int[] ids;
     private Edge[] edges;
 
+    private double scale = 4.0;
+    private double offsetX = 0.0;
+    private double offsetY = 0.0;
+    private int selectedIndex = -1;
+    private final int RADIUS = 6;
+    private boolean draggingCamera = false;
+    private Point lastMouse;
+    private boolean showLabels = true;
+
     public DrawGraph(Point2D.Double[] pts, int[] ids, Edge[] edges) {
         this.points = pts;
         this.ids = ids;
         this.edges = edges;
+
+
+        addMouseWheelListener(e -> {
+
+            double oldScale = scale;
+            double zoomFactor = 1.1;
+
+            if (e.getPreciseWheelRotation() < 0 && scale < 80) {
+                scale *= zoomFactor;
+            } else if (e.getPreciseWheelRotation() > 0 && scale > 0.2){
+                scale /= zoomFactor;
+            }
+
+
+            Point p = e.getPoint();
+
+            double scaleChange = scale / oldScale;
+
+            offsetX = p.x - scaleChange * (p.x - offsetX);
+            offsetY = p.y - scaleChange * (p.y - offsetY);
+            repaint();
+        });
+
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e){
+                Point2D.Double world = screenToWorld(e.getPoint());
+                selectedIndex = -1;
+                for(int i=0; i < points.length; i++){
+                    double dx = points[i].x - world.x;
+                    double dy = points[i].y - world.y;
+
+                    if(dx * dx + dy * dy < 10){
+                        selectedIndex = i;
+                        break;
+                    }
+                }
+                if(selectedIndex == -1){
+                    draggingCamera = true;
+                    lastMouse = e.getPoint();
+                }
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e){
+                selectedIndex = -1;
+                draggingCamera = false;
+            }
+        });
+
+        addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                if(selectedIndex != -1) {
+                    Point2D.Double world = screenToWorld(e.getPoint());
+                    points[selectedIndex].x = world.x;
+                    points[selectedIndex].y = world.y;
+                }
+                else if (draggingCamera) {
+                    offsetX += e.getX() - lastMouse.x;
+                    offsetY += e.getY() - lastMouse.y;
+                    lastMouse = e.getPoint();
+                }
+                repaint();
+            }
+        });
+    }
+
+    private Point2D.Double screenToWorld(Point p) {
+        return new Point2D.Double(
+                (p.x - offsetX) / scale,
+                (p.y - offsetY) / scale
+        );
+    }
+
+    @Override
+    public void addNotify(){
+        super.addNotify();
+
+        offsetX = getWidth() / 2.0;
+        offsetY = getHeight() / 2.0;
+    }
+
+    private void drawAxes(Graphics2D g2) {
+
+        g2.setColor(Color.BLACK);
+
+        double left = -offsetX / scale;
+        double right = (getWidth() - offsetX) / scale;
+
+        double top = -offsetY / scale;
+        double bottom = (getHeight() - offsetY) / scale;
+
+        // oś X
+        g2.drawLine((int) left, 0, (int) right, 0);
+
+        // oś Y
+        g2.drawLine(0, (int) top, 0, (int) bottom);
     }
 
     @Override
@@ -23,90 +132,109 @@ public class DrawGraph extends JPanel {
 
         Graphics2D g2 = (Graphics2D) g;
 
-        g2.setStroke(new BasicStroke(2));
-        g2.setFont(new Font("Arial", Font.PLAIN, 12));
+        g2.setStroke(new BasicStroke(0.7f));
+        g2.setFont(new Font("Arial", Font.PLAIN, 16));
 
-        int centerX = getWidth() / 2;
-        int centerY = getHeight() / 2;
+        AffineTransform original = g2.getTransform();
 
-        double scale = 20;
+        g2.translate(offsetX, offsetY);
+        g2.scale(scale, scale);
 
-        // AXIS
-        g2.setColor(Color.BLACK);
-        g2.drawLine(0, centerY, getWidth(), centerY);
-        g2.drawLine(centerX, 0, centerX, getHeight());
 
-        // KRAWEDZIE
+        drawAxes(g2);
+
+        g2.setColor(Color.RED);
+
         for (Edge edge : edges) {
 
             int fromIndex = -1;
             int toIndex = -1;
 
-            // znalezienie indeksow punktow
             for (int i = 0; i < ids.length; i++) {
-
-                if (ids[i] == edge.from) {
-                    fromIndex = i;
-                }
-
-                if (ids[i] == edge.to) {
-                    toIndex = i;
-                }
+                if (ids[i] == edge.from) fromIndex = i;
+                if (ids[i] == edge.to) toIndex = i;
             }
 
-            if (fromIndex == -1 || toIndex == -1) {
-                continue;
-            }
+            if (fromIndex == -1 || toIndex == -1) continue;
 
             Point2D.Double p1 = points[fromIndex];
             Point2D.Double p2 = points[toIndex];
 
-            int x1 = centerX + (int)(p1.x * scale);
-            int y1 = centerY - (int)(p1.y * scale);
-
-            int x2 = centerX + (int)(p2.x * scale);
-            int y2 = centerY - (int)(p2.y * scale);
-
-            // linia
-            g2.setColor(Color.RED);
-            g2.drawLine(x1, y1, x2, y2);
-
-            // srodek linii
-            int midX = (x1 + x2) / 2;
-            int midY = (y1 + y2) / 2;
-
-            // tekst dlugosci
-            String lengthText = String.format("%.2f", edge.length);
-
-            double angle = Math.atan2(y2 - y1, x2 - x1);
-
-            if (angle > Math.PI / 2 || angle < -Math.PI / 2) {
-                angle += Math.PI;
-            }
-
-            g2.setColor(Color.BLACK);
-
-            g2.translate(midX, midY);
-            g2.rotate(angle);
-            g2.drawString(lengthText, -10, -5);
-            g2.rotate(-angle);
-            g2.translate(-midX, -midY);
+            g2.drawLine((int)p1.x, (int)p1.y, (int)p2.x, (int)p2.y);
         }
 
-        // PUNKTY
         g2.setColor(Color.BLUE);
 
         for (int i = 0; i < points.length; i++) {
 
             Point2D.Double p = points[i];
 
-            int x = centerX + (int)(p.x * scale);
-            int y = centerY - (int)(p.y * scale);
-
-            g2.fillOval(x - 3, y - 3, 6, 6);
-
-            String label = ids[i] + "(" + p.x + ", " + p.y + ")";
-            g2.drawString(label, x + 6, y - 6);
+            g2.fillOval((int)p.x - 2, (int)p.y - 2, 4, 4);
         }
+
+        g2.setTransform(original);
+
+        drawLabels(g2);
+
+
+    }
+    public void clear() {
+        this.points = new Point2D.Double[0];
+        this.ids = new int[0];
+        this.edges = new Edge[0];
+        repaint();
+    }
+
+    private void drawLabels(Graphics2D g2) {
+
+        if (!showLabels) {
+            return;
+        }
+
+        g2.setColor(Color.BLACK);
+
+        for (int i = 0; i < points.length; i++) {
+
+            Point2D.Double p = points[i];
+
+            int screenX = (int) (p.x * scale + offsetX);
+            int screenY = (int) (p.y * scale + offsetY);
+
+            String label = String.format("%d (%.2f, %.2f)", ids[i], p.x, p.y);
+
+            g2.drawString(label, screenX + 6, screenY - 6);
+        }
+
+        g2.setColor(Color.BLACK);
+
+        for (int i = 0; i < edges.length; i++) {
+
+            Edge edge = edges[i];
+
+            int fromIndex = -1;
+            int toIndex = -1;
+
+            for (int j = 0; j < ids.length; j++) {
+                if (ids[j] == edge.from) fromIndex = j;
+                if (ids[j] == edge.to) toIndex = j;
+            }
+
+            if (fromIndex == -1 || toIndex == -1) continue;
+
+            Point2D.Double p1 = points[fromIndex];
+            Point2D.Double p2 = points[toIndex];
+
+            int midX = (int)(((p1.x + p2.x) / 2) * scale + offsetX);
+            int midY = (int)(((p1.y + p2.y) / 2) * scale + offsetY);
+
+            String lengthText = String.format("%.2f", edge.length);
+
+            g2.drawString(lengthText, midX, midY);
+        }
+    }
+
+    public void toggleLabels(){
+        showLabels = !showLabels;
+        repaint();
     }
 }

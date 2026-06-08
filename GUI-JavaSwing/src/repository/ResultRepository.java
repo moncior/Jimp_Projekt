@@ -11,7 +11,7 @@ public class ResultRepository {
     private int[] ids;
     private Edge[] edges;
 
-    public void readCoordinates(File coord){
+    public void readCoordinates(File coord) throws IOException{
 
         List<Point2D.Double> pointsList = new ArrayList<>();
         List<Integer> idsList = new ArrayList<>();
@@ -45,28 +45,17 @@ public class ResultRepository {
         }
     }
 
-    public void readEdges(File edgeFile){
-
+    public void readEdges(File edgeFile) throws IOException {
         List<Edge> edgesList = new ArrayList<>();
-
-        try(BufferedReader in = new BufferedReader(new FileReader(edgeFile))){
-
-            String line;
-
-            while((line = in.readLine()) != null){
-
-                String[] data = line.split(" ");
-
-                int id = Integer.parseInt(data[0]);
-                int from = Integer.parseInt(data[1]);
-                int to = Integer.parseInt(data[2]);
-                double length = Double.parseDouble(data[3]);
-
-                edgesList.add(new Edge(id, from, to, length));
-            }
-        }
-        catch(IOException e){
-            e.printStackTrace();
+        BufferedReader in = new BufferedReader(new FileReader(edgeFile));
+        String line;
+        while((line = in.readLine()) != null){
+            String[] data = line.split("\\s+");
+            String id = data[0];
+            int from = Integer.parseInt(data[1]);
+            int to = Integer.parseInt(data[2]);
+            double length = Double.parseDouble(data[3]);
+            edgesList.add(new Edge(id, from, to, length));
         }
 
         edges = edgesList.toArray(new Edge[0]);
